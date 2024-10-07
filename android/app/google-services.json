@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "134763466334",
+    "project_id": "flutter-mock-firebase-auth",
+    "storage_bucket": "flutter-mock-firebase-auth.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:134763466334:android:51244bc34e4b988c4feecf",
+        "android_client_info": {
+          "package_name": "com.exam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLjazDqeZbki5Usf6_0uAUSla9c25-mkM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
