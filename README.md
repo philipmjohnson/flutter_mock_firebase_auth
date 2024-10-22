@@ -1,13 +1,11 @@
 # flutter_mock_firebase_auth
 
-## TO DO
+This app illustrates how to implement an integration test based on:
+* [riverpod](https://pub.dev/packages/flutter_riverpod)
+* [firebase_ui_auth](https://pub.dev/packages/firebase_ui_auth)
+* [firebase_auth_mocks](https://pub.dev/packages/firebase_auth_mocks)
 
-* Create signin page. 
-* Create profile page.
-* Create router.
-* Create riverpod provider for firebase auth.
-* Test registration and login using regular firebase auth.
-* Create integration test with overrides for firebase auth.
+
 
 ## Installation
 
