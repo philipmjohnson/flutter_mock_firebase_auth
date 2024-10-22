@@ -1,4 +1,4 @@
-# sample-firebase-auth-mockup
+# flutter_mock_firebase_auth
 
 ## TO DO
 
