@@ -36,3 +36,13 @@ and your favorite flavor of
 ```
 flutter run
 ```
+
+What should appear is the SignIn screen:
+
+<img width="300px" src="signin-screen.png">
+
+Click to register a new user. Once you've gone through that process, you should see the  Profile screen:
+
+<img width="300px" src="profile-screen.png">
+
+These are basically the only two functioning screens in the app, because the goal of this app is to illustrate how to mock Firebase Authentication. We want a way to do integration testing that enables us to mock the sign in process and get to the Profile screen without actually accessing the Firebase Authentication server.
