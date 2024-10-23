@@ -43,4 +43,22 @@ Click to register a new user. Once you've gone through that process, you should 
 
 <img width="300px" src="profile-screen.png">
 
-These are basically the only two functioning screens in the app, because the goal of this app is to illustrate how to mock Firebase Authentication. We want a way to do integration testing that enables us to mock the sign in process and get to the Profile screen without actually accessing the Firebase Authentication server.
+When you can register and signin and see the Profile screen, you have verified that the app is working correctly. 
+
+This app contains only a SignIn and Profile screen, because the goal of this app is to illustrate how to mock Firebase Authentication. The goal is to illustrate how to do integration testing such that we can mock the signin process and get to the Profile screen without actually accessing the Firebase Authentication server.
+
+## Run the integration test
+
+To run the sample integration test, invoke:
+```
+flutter test integration_test/app_test.dart
+```
+
+This should produce output similar to:
+```
+00:17 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase_auth/integration_test/app_test.dart              
+Ru00:39 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase_auth/integration_test/app_test.dart               
+00:43 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase_auth/integration_test/app_test.dart           4.1s
+Xcode build done.                                           26.2s
+00:46 +1: All tests passed!       
+```
