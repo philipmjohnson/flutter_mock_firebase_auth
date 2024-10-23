@@ -53,7 +53,7 @@ To run the sample integration test, invoke:
 flutter test integration_test/app_test.dart
 ```
 
-This should produce output similar to:
+We would like it to produce output similar to:
 ```
 00:17 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase_auth/integration_test/app_test.dart              
 Ru00:39 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase_auth/integration_test/app_test.dart               
@@ -62,7 +62,7 @@ Xcode build done.                                           26.2s
 00:46 +1: All tests passed!       
 ```
 
-But it does not. Instead, it produces (in part):
+But it does not. Instead, it produces (in part) this:
 
 ```
 flutter test integration_test/app_test.dart
@@ -81,26 +81,15 @@ To understand this output, here is the integration test code:
 
 ```dart
 void main() {
+  String testEmail = 'bob@example.com';
+  String testPassword = 'foobarbaz';
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   group('Sample Integration Test', () {
     patrolWidgetTest('Access Profile Screen', (PatrolTester $) async {
       await Firebase.initializeApp();
       setFirebaseUiIsTestMode(true);
-      // Mock sign in with Google.
-      final googleSignIn = MockGoogleSignIn();
-      final signinAccount = await googleSignIn.signIn();
-      final googleAuth = await signinAccount?.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
-      );
-      // Sign in.
-      final user = MockUser(
-        isAnonymous: false,
-        uid: 'someuid',
-        email: 'bob@somedomain.com',
-        displayName: 'Bob',
-      );
+      // Set up Mock authentication.
+      final user = MockUser(isAnonymous: false, email: testEmail);
       FirebaseAuth mockFirebaseAuth = MockFirebaseAuth(mockUser: user);
       AuthRepository mockAuthRepository = AuthRepository(mockFirebaseAuth);
       await $.pumpWidgetAndSettle(ProviderScope(
@@ -115,12 +104,18 @@ void main() {
       // Verify that no user is signed in.
       User? loggedInUser = mockFirebaseAuth.currentUser;
       expect(loggedInUser, null, reason: 'A user is already signed in');
-      // Mock the sign in process.
-      final result = await mockFirebaseAuth.signInWithCredential(credential);
-      expect(result.user?.displayName, 'Bob', reason: 'User not signed in');
-      // Verify that we are at the profile screen.
+      // Fill out the email and password fields and submit.
+      await $(EmailInput).$(TextFormField).enterText(testEmail);
+      await $(PasswordInput).$(TextFormField).enterText(testPassword);
+      await $(EmailForm).$(OutlinedButton).tap();
+      // After signing in, should go to Profile screen.
       expect($(#profileScreen).exists, true, reason: 'Not at Profile screen');
     });
   });
 }
 ```
+
+The essential problem is this:
+
+* The mock authentication repo is defined with a testUser, but there is not a password defined for that user. That is why the test fails when the form is filled out and submitted with the testEmail and testPassword.
+* If I try to define a password for the user (such as with the createUserWithEmailAndPassword method), then I get a Null pointer check. This seems due to the fact that the authentication provider thinks that a user is logged in, but the system is displaying the SignIn page. 
