@@ -1,11 +1,10 @@
 # flutter_mock_firebase_auth
 
 This app illustrates how to implement an integration test based on:
-* [riverpod](https://pub.dev/packages/flutter_riverpod)
-* [firebase_ui_auth](https://pub.dev/packages/firebase_ui_auth)
-* [firebase_auth_mocks](https://pub.dev/packages/firebase_auth_mocks)
-
-
+* [riverpod](https://pub.dev/packages/flutter_riverpod) (to enable overriding of FirebaseAuth and AuthRepository instances with mocks during testing).
+* [firebase_ui_auth](https://pub.dev/packages/firebase_ui_auth) (to implement the signin and profile screens)
+* [firebase_auth_mocks](https://pub.dev/packages/firebase_auth_mocks) (to mock the FirebaseAuth and AuthRepository instances).
+* [patrol_finders](https://pub.dev/packages/patrol_finders) (to simplify tests to check what screen is displayed during the integration test.
 
 ## Installation
 
@@ -61,4 +60,67 @@ Ru00:39 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase
 00:43 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase_auth/integration_test/app_test.dart           4.1s
 Xcode build done.                                           26.2s
 00:46 +1: All tests passed!       
+```
+
+But it does not. Instead, it produces (in part):
+
+```
+flutter test integration_test/app_test.dart
+00:06 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase_auth/integration_test/app_test.dart              Ru00:27 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase_auth/integration_test/app_test.dart               
+00:30 +0: ... /Users/philipjohnson/GitHub/philipmjohnson/flutter_mock_firebase_auth/integration_test/app_test.dart           3.7s
+Xcode build done.                                           24.3s
+00:33 +0: Sample Integration Test Access Profile Screen                                                                          
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: <true>
+  Actual: <false>
+Not at Profile screen
+```
+
+To understand this output, here is the integration test code:
+
+```dart
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  group('Sample Integration Test', () {
+    patrolWidgetTest('Access Profile Screen', (PatrolTester $) async {
+      await Firebase.initializeApp();
+      setFirebaseUiIsTestMode(true);
+      // Mock sign in with Google.
+      final googleSignIn = MockGoogleSignIn();
+      final signinAccount = await googleSignIn.signIn();
+      final googleAuth = await signinAccount?.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+      // Sign in.
+      final user = MockUser(
+        isAnonymous: false,
+        uid: 'someuid',
+        email: 'bob@somedomain.com',
+        displayName: 'Bob',
+      );
+      FirebaseAuth mockFirebaseAuth = MockFirebaseAuth(mockUser: user);
+      AuthRepository mockAuthRepository = AuthRepository(mockFirebaseAuth);
+      await $.pumpWidgetAndSettle(ProviderScope(
+        overrides: [
+          firebaseAuthProvider.overrideWithValue(mockFirebaseAuth),
+          authRepositoryProvider.overrideWithValue(mockAuthRepository)
+        ],
+        child: MyApp(),
+      ));
+      // Verify that we are at the signin screen.
+      expect($(#signInScreen).exists, true, reason: 'Not at SignIn screen.');
+      // Verify that no user is signed in.
+      User? loggedInUser = mockFirebaseAuth.currentUser;
+      expect(loggedInUser, null, reason: 'A user is already signed in');
+      // Mock the sign in process.
+      final result = await mockFirebaseAuth.signInWithCredential(credential);
+      expect(result.user?.displayName, 'Bob', reason: 'User not signed in');
+      // Verify that we are at the profile screen.
+      expect($(#profileScreen).exists, true, reason: 'Not at Profile screen');
+    });
+  });
+}
 ```

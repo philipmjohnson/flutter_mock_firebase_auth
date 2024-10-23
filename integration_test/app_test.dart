@@ -31,17 +31,25 @@ void main() {
         email: 'bob@somedomain.com',
         displayName: 'Bob',
       );
-      FirebaseAuth mockAuth = MockFirebaseAuth(mockUser: user);
+      FirebaseAuth mockFirebaseAuth = MockFirebaseAuth(mockUser: user);
+      AuthRepository mockAuthRepository = AuthRepository(mockFirebaseAuth);
       await $.pumpWidgetAndSettle(ProviderScope(
         overrides: [
-          firebaseAuthProvider.overrideWithValue(mockAuth),
+          firebaseAuthProvider.overrideWithValue(mockFirebaseAuth),
+          authRepositoryProvider.overrideWithValue(mockAuthRepository)
         ],
         child: MyApp(),
       ));
-
-      // expect($(#getStartedButton).exists, true);
-      // await $(#getStartedButton).tap();
-      // expect($(#signInScreen).exists, true);
+      // Verify that we are at the signin screen.
+      expect($(#signInScreen).exists, true, reason: 'Not at SignIn screen.');
+      // Verify that no user is signed in.
+      User? loggedInUser = mockFirebaseAuth.currentUser;
+      expect(loggedInUser, null, reason: 'A user is already signed in');
+      // Mock the sign in process.
+      final result = await mockFirebaseAuth.signInWithCredential(credential);
+      expect(result.user?.displayName, 'Bob', reason: 'User not signed in');
+      // Verify that we are at the profile screen.
+      expect($(#profileScreen).exists, true, reason: 'Not at Profile screen');
     });
   });
 }
