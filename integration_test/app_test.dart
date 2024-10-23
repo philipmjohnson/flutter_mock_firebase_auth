@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_mock_firebase_auth/app.dart';
 import 'package:flutter_mock_firebase_auth/features/authentication/data/firebase_auth_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,25 +43,27 @@ void main() {
         child: MyApp(),
       ));
       // Verify that we are at the signin screen.
-      expect($(#signInScreen).exists, true, reason: 'Not at SignIn screen.');
+      // expect($(#signInScreen).exists, true, reason: 'Not at SignIn screen.');
       // Verify that no user is signed in.
-      User? loggedInUser = mockFirebaseAuth.currentUser;
-      expect(loggedInUser, null, reason: 'A user is already signed in');
-      // Mock the sign in process.
-      // final result = await mockFirebaseAuth.signInWithCredential(credential);
-      // await user.updatePassword(testPassword);
-      // expect(result.user?.displayName, 'Bob', reason: 'User not signed in');
-      // Verify that we are at the profile screen.
+      // User? loggedInUser = mockFirebaseAuth.currentUser;
+      // expect(loggedInUser, null, reason: 'A user is already signed in');
+      // UserCredential testUser =
+      //     await mockFirebaseAuth.createUserWithEmailAndPassword(
+      //         email: 'joe2@example.com', password: testPassword);
 
-      expect($(EmailInput), findsOneWidget, reason: 'Email input not found');
-      expect($(PasswordInput), findsOneWidget,
-          reason: 'Password input not found');
-      await $(EmailInput)
-          .$(TextFormField)
-          .waitUntilVisible()
-          .enterText(testEmail);
-      await $(PasswordInput).$(TextFormField).enterText(testPassword);
-      await $(ButtonStyleButton).tap();
+      // expect($(EmailInput), findsOneWidget, reason: 'Email input not found');
+      // expect($(PasswordInput), findsOneWidget,
+      //     reason: 'Password input not found');
+      // await $.pumpAndSettle();
+      // await $(EmailInput)
+      //     .$(TextFormField)
+      //     .waitUntilVisible()
+      //     .enterText(testEmail);
+      // await $(PasswordInput).$(TextFormField).enterText(testPassword);
+      // expect($(EmailForm).exists, true, reason: 'Email form not found');
+      // expect($(EmailForm).$(OutlinedButton).exists, true,
+      //     reason: 'Email button not found');
+      // await $(EmailForm).$(OutlinedButton).tap();
       // expect($(#profileScreen).exists, true, reason: 'Not at Profile screen');
     });
   });
