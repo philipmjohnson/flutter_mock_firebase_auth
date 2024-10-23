@@ -18,10 +18,11 @@ void main() {
     patrolWidgetTest('Access Profile Screen', (PatrolTester $) async {
       await Firebase.initializeApp();
       setFirebaseUiIsTestMode(true);
-      // Set up Mock authentication.
+      // 1. Set up Mock authentication.
       final user = MockUser(isAnonymous: false, email: testEmail);
       FirebaseAuth mockFirebaseAuth = MockFirebaseAuth(mockUser: user);
       AuthRepository mockAuthRepository = AuthRepository(mockFirebaseAuth);
+      // 2. Start up the app, overriding providers to use mock authentication.
       await $.pumpWidgetAndSettle(ProviderScope(
         overrides: [
           firebaseAuthProvider.overrideWithValue(mockFirebaseAuth),
@@ -29,16 +30,17 @@ void main() {
         ],
         child: MyApp(),
       ));
-      // Verify that we are at the signin screen.
+      // 3. Verify that the app displays the signin screen.
       expect($(#signInScreen).exists, true, reason: 'Not at SignIn screen.');
-      // Verify that no user is signed in.
+      // 4. Verify that no user is signed in.
       User? loggedInUser = mockFirebaseAuth.currentUser;
       expect(loggedInUser, null, reason: 'A user is already signed in');
-      // Fill out the email and password fields and submit.
+      // 5. Fill out the email and password fields and submit.
       await $(EmailInput).$(TextFormField).enterText(testEmail);
       await $(PasswordInput).$(TextFormField).enterText(testPassword);
       await $(EmailForm).$(OutlinedButton).tap();
-      // After signing in, should go to Profile screen.
+      // 6. After successful signin, should go to Profile screen.
+      // However, this fails because no password is defined for this user.
       expect($(#profileScreen).exists, true, reason: 'Not at Profile screen');
     });
   });

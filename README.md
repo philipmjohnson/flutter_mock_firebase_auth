@@ -1,6 +1,9 @@
 # flutter_mock_firebase_auth
 
-This app illustrates how to implement an integration test based on:
+> [!WARNING]  
+> This example app does not yet correctly implement the intended behavior of logging in a test user to a Flutter app and having the app display the correct post-login page. More details below.
+
+This app is intended to illustrate how to implement an integration test based on:
 * [riverpod](https://pub.dev/packages/flutter_riverpod) (to enable overriding of FirebaseAuth and AuthRepository instances with mocks during testing).
 * [firebase_ui_auth](https://pub.dev/packages/firebase_ui_auth) (to implement the signin and profile screens)
 * [firebase_auth_mocks](https://pub.dev/packages/firebase_auth_mocks) (to mock the FirebaseAuth and AuthRepository instances).
@@ -44,7 +47,9 @@ Click to register a new user. Once you've gone through that process, you should 
 
 When you can register and signin and see the Profile screen, you have verified that the app is working correctly. 
 
-This app contains only a SignIn and Profile screen, because the goal of this app is to illustrate how to mock Firebase Authentication. The goal is to illustrate how to do integration testing such that we can mock the signin process and get to the Profile screen without actually accessing the Firebase Authentication server.
+This app contains only a SignIn and Profile screen, because the goal of this app is to explore how to mock Firebase Authentication. 
+
+The goal of this app is to illustrate how to do integration testing such that we can mock the signin process and get to the Profile screen without actually accessing the Firebase Authentication server.
 
 ## Run the integration test
 
@@ -77,7 +82,7 @@ Expected: <true>
 Not at Profile screen
 ```
 
-To understand this output, here is the integration test code:
+To understand this output, here is the integration test code in `integration_test/app_test.dart`:
 
 ```dart
 void main() {
@@ -88,10 +93,11 @@ void main() {
     patrolWidgetTest('Access Profile Screen', (PatrolTester $) async {
       await Firebase.initializeApp();
       setFirebaseUiIsTestMode(true);
-      // Set up Mock authentication.
+      // 1. Set up Mock authentication.
       final user = MockUser(isAnonymous: false, email: testEmail);
       FirebaseAuth mockFirebaseAuth = MockFirebaseAuth(mockUser: user);
       AuthRepository mockAuthRepository = AuthRepository(mockFirebaseAuth);
+      // 2. Start up the app, overriding providers to use mock authentication.
       await $.pumpWidgetAndSettle(ProviderScope(
         overrides: [
           firebaseAuthProvider.overrideWithValue(mockFirebaseAuth),
@@ -99,16 +105,17 @@ void main() {
         ],
         child: MyApp(),
       ));
-      // Verify that we are at the signin screen.
+      // 3. Verify that the app displays the signin screen.
       expect($(#signInScreen).exists, true, reason: 'Not at SignIn screen.');
-      // Verify that no user is signed in.
+      // 4. Verify that no user is signed in.
       User? loggedInUser = mockFirebaseAuth.currentUser;
       expect(loggedInUser, null, reason: 'A user is already signed in');
-      // Fill out the email and password fields and submit.
+      // 5. Fill out the email and password fields and submit.
       await $(EmailInput).$(TextFormField).enterText(testEmail);
       await $(PasswordInput).$(TextFormField).enterText(testPassword);
       await $(EmailForm).$(OutlinedButton).tap();
-      // After signing in, should go to Profile screen.
+      // 6. After successful signin, should go to Profile screen.
+      // However, this fails because no password is defined for this user. 
       expect($(#profileScreen).exists, true, reason: 'Not at Profile screen');
     });
   });
