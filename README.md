@@ -78,4 +78,4 @@ But it does not due to issues with the firebase_auth_mocks package which are rep
 
 All is not lost, however. If you define an authenticated user prior to starting the integration test, then the app behaves as if the user was already signed in, the first screen displays the Profile page, and you can continue testing from there.
 
-This approach is illustrated in [app_test2.dart](https://github.com/philipmjohnson/flutter_mock_firebase_auth/blob/main/integration_test/app_test.dart).
+This approach is illustrated in [app_test2.dart](https://github.com/philipmjohnson/flutter_mock_firebase_auth/blob/main/integration_test/app_test2.dart).
