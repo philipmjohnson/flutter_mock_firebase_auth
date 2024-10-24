@@ -51,12 +51,17 @@ This app contains only a SignIn and Profile screen, because the goal of this app
 
 The goal of this app is to illustrate how to do integration testing such that we can mock the signin process and get to the Profile screen without actually accessing the Firebase Authentication server.
 
-## Run the integration test
+## Run the integration tests
 
-To run the sample integration test, invoke:
+### Integration test for signin workflow
+
+To run an integration test that steps through the signin and authentication workflow, invoke:
+
 ```
 flutter test integration_test/app_test.dart
 ```
+
+Here's the code for [app_test.dart](https://github.com/philipmjohnson/flutter_mock_firebase_auth/blob/main/integration_test/app_test.dart).
 
 We would like it to produce output similar to:
 ```
@@ -68,3 +73,9 @@ Xcode build done.                                           26.2s
 ```
 
 But it does not due to issues with the firebase_auth_mocks package which are reported [here](https://github.com/atn832/firebase_auth_mocks/issues/114).
+
+### Integration test where authenticated user is defined prior to test
+
+All is not lost, however. If you define an authenticated user prior to starting the integration test, then the app behaves as if the user was already signed in, the first screen displays the Profile page, and you can continue testing from there.
+
+This approach is illustrated in [app_test2.dart](https://github.com/philipmjohnson/flutter_mock_firebase_auth/blob/main/integration_test/app_test.dart).
